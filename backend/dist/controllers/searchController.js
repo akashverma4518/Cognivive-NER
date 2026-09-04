@@ -38,19 +38,34 @@ const searchGlobal = async (req, res) => {
        LIMIT 10`, [searchPattern]);
         let reminders = [];
         let patients = [];
-        // 2. Elder Search: Only searches Elder's own active reminders
+        let wellness = [];
+        let familyMemories = [];
+        // 2. Elder Search: Only searches Elder's own active reminders, wellness, and family memories
         if (role === 'ELDER') {
             const remRes = await (0, db_1.query)(`SELECT id, title, type, scheduled_time, dosage_or_notes, is_active
          FROM reminders
          WHERE patient_id = $1 AND is_active = TRUE
-           AND (title ILIKE $2 OR dosage_or_notes ILIKE $2 OR type::text ILIKE $2)
+           AND (title ILIKE $2 OR dosage_or_notes ILIKE $2 OR type::text ILIKE $2 OR medicine_name ILIKE $2)
          ORDER BY scheduled_time ASC
          LIMIT 10`, [userId, searchPattern]);
             reminders = remRes.rows;
+            const wellRes = await (0, db_1.query)(`SELECT id, activity_type, duration_minutes, completed_at, notes
+         FROM wellness_activities
+         WHERE patient_id = $1 AND (activity_type ILIKE $2 OR notes ILIKE $2)
+         ORDER BY completed_at DESC
+         LIMIT 5`, [userId, searchPattern]);
+            wellness = wellRes.rows;
+            const famRes = await (0, db_1.query)(`SELECT id, member_name, relationship, important_place, important_event, memory_text
+         FROM family_memory_items
+         WHERE patient_id = $1
+           AND (member_name ILIKE $2 OR relationship ILIKE $2 OR important_place ILIKE $2 OR memory_text ILIKE $2)
+         ORDER BY created_at DESC
+         LIMIT 5`, [userId, searchPattern]);
+            familyMemories = famRes.rows;
             // Strictly prevent patient list leakage to Elder
             patients = [];
         }
-        // 3. Caregiver Search: ONLY searches assigned patients and their reminders
+        // 3. Caregiver Search: ONLY searches assigned patients, patient reminders, and memories
         else if (role === 'CAREGIVER') {
             const patRes = await (0, db_1.query)(`SELECT u.id as patient_id,
                 u.full_name,
@@ -84,6 +99,15 @@ const searchGlobal = async (req, res) => {
          ORDER BY r.scheduled_time ASC
          LIMIT 10`, [userId, searchPattern]);
             reminders = remRes.rows;
+            const famRes = await (0, db_1.query)(`SELECT f.id, f.patient_id, u.full_name as patient_name, f.member_name, f.relationship, f.important_place, f.memory_text
+         FROM family_memory_items f
+         JOIN caregiver_patient_links l ON f.patient_id = l.patient_id
+         JOIN users u ON f.patient_id = u.id
+         WHERE l.caregiver_id = $1
+           AND (f.member_name ILIKE $2 OR f.relationship ILIKE $2 OR f.memory_text ILIKE $2 OR u.full_name ILIKE $2)
+         ORDER BY f.created_at DESC
+         LIMIT 5`, [userId, searchPattern]);
+            familyMemories = famRes.rows;
         }
         // 4. Clinician & Admin Search: Broad clinical scope
         else if (role === 'CLINICIAN' || role === 'ADMIN') {
@@ -108,7 +132,9 @@ const searchGlobal = async (req, res) => {
             results: {
                 games: gamesRes.rows,
                 reminders,
-                patients
+                patients,
+                wellness,
+                familyMemories
             }
         });
     }
