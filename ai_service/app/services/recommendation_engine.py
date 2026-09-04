@@ -30,6 +30,18 @@ class RecommendationEngine:
             "title": "Golden Memories",
             "domain": "REMINISCENCE",
             "duration": 6
+        },
+        "ATTENTION": {
+            "game_id": "pattern_path",
+            "title": "Pattern Path",
+            "domain": "ATTENTION",
+            "duration": 5
+        },
+        "EXECUTIVE_FLEXIBILITY": {
+            "game_id": "sort_remember",
+            "title": "Sort & Remember",
+            "domain": "EXECUTIVE_FLEXIBILITY",
+            "duration": 5
         }
     }
 
@@ -39,24 +51,15 @@ class RecommendationEngine:
             "WORKING_MEMORY": req.working_memory_score,
             "PROCESSING_SPEED": req.processing_speed_score,
             "ATTENTION": req.attention_score,
-            "REMINISCENCE": req.reminiscence_score
+            "REMINISCENCE": req.reminiscence_score,
+            "EXECUTIVE_FLEXIBILITY": getattr(req, "executive_flexibility_score", 50.0)
         }
 
-        # Find the domain with the lowest score for gentle targeted practice
-        # Priority map to our 3 prioritized games:
-        # If attention or processing speed is lowest -> quick_harvest
-        # If working memory is lowest -> memory_blossom
-        # If reminiscence is lowest -> golden_memories
+        # Find the domain with lowest score for targeted practice
         sorted_domains = sorted(domain_scores.items(), key=lambda x: x[1])
         target_domain_key = sorted_domains[0][0]
 
-        if target_domain_key in ["PROCESSING_SPEED", "ATTENTION"]:
-            primary_domain = "PROCESSING_SPEED"
-        elif target_domain_key == "WORKING_MEMORY":
-            primary_domain = "WORKING_MEMORY"
-        else:
-            primary_domain = "REMINISCENCE"
-
+        primary_domain = target_domain_key if target_domain_key in RecommendationEngine.ACTIVITIES else "PROCESSING_SPEED"
         primary_meta = RecommendationEngine.ACTIVITIES[primary_domain]
 
         # Calculate suggested difficulty based on that domain's score

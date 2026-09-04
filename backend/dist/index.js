@@ -16,6 +16,7 @@ const reminderRoutes_1 = __importDefault(require("./routes/reminderRoutes"));
 const caregiverRoutes_1 = __importDefault(require("./routes/caregiverRoutes"));
 const syncRoutes_1 = __importDefault(require("./routes/syncRoutes"));
 const aiProxyRoutes_1 = __importDefault(require("./routes/aiProxyRoutes"));
+const searchRoutes_1 = __importDefault(require("./routes/searchRoutes"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({ origin: env_1.ENV.CORS_ORIGIN, credentials: true }));
 app.use(express_1.default.json());
@@ -47,6 +48,8 @@ app.use('/api/v1/reminders', reminderRoutes_1.default);
 app.use('/api/v1/caregiver', caregiverRoutes_1.default);
 app.use('/api/v1/sync', syncRoutes_1.default);
 app.use('/api/v1/ai', aiProxyRoutes_1.default);
+app.use('/api/v1/search', searchRoutes_1.default);
+app.use('/api/search', searchRoutes_1.default);
 app.use(errorHandler_1.errorHandler);
 const server = app.listen(env_1.ENV.PORT, async () => {
     console.log(`[Cognivive Backend] Server listening on port ${env_1.ENV.PORT}`);

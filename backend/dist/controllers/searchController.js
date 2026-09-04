@@ -1,0 +1,119 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.searchGlobal = void 0;
+const db_1 = require("../config/db");
+/**
+ * Global Search Controller
+ * Provides secure, RBAC-isolated application search:
+ * - Elders can search active games, their own reminders, and activity guides.
+ * - Caregivers can search their assigned patients, patient reminders, and games.
+ * - Enforces strict tenant and role isolation: Elders never see other users;
+ *   Caregivers only see patients explicitly assigned to them.
+ */
+const searchGlobal = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        const role = req.user?.role;
+        if (!userId || !role) {
+            return res.status(401).json({ success: false, message: 'Authentication required.' });
+        }
+        const rawQuery = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+        if (!rawQuery) {
+            return res.json({
+                success: true,
+                query: '',
+                results: {
+                    games: [],
+                    reminders: [],
+                    patients: []
+                }
+            });
+        }
+        const searchPattern = `%${rawQuery}%`;
+        // 1. Search Cognitive Games (Available to all authenticated roles)
+        const gamesRes = await (0, db_1.query)(`SELECT id, title, primary_domain as domain, description, min_difficulty, max_difficulty
+       FROM games
+       WHERE title ILIKE $1 OR description ILIKE $1 OR primary_domain::text ILIKE $1
+       ORDER BY title ASC
+       LIMIT 10`, [searchPattern]);
+        let reminders = [];
+        let patients = [];
+        // 2. Elder Search: Only searches Elder's own active reminders
+        if (role === 'ELDER') {
+            const remRes = await (0, db_1.query)(`SELECT id, title, type, scheduled_time, dosage_or_notes, is_active
+         FROM reminders
+         WHERE patient_id = $1 AND is_active = TRUE
+           AND (title ILIKE $2 OR dosage_or_notes ILIKE $2 OR type::text ILIKE $2)
+         ORDER BY scheduled_time ASC
+         LIMIT 10`, [userId, searchPattern]);
+            reminders = remRes.rows;
+            // Strictly prevent patient list leakage to Elder
+            patients = [];
+        }
+        // 3. Caregiver Search: ONLY searches assigned patients and their reminders
+        else if (role === 'CAREGIVER') {
+            const patRes = await (0, db_1.query)(`SELECT u.id as patient_id,
+                u.full_name,
+                u.email,
+                u.phone_number,
+                l.relationship,
+                p.status as activity_status,
+                c.overall_performance_score
+         FROM caregiver_patient_links l
+         JOIN users u ON l.patient_id = u.id
+         LEFT JOIN patient_profiles p ON u.id = p.user_id
+         LEFT JOIN cognitive_profiles c ON u.id = c.patient_id
+         WHERE l.caregiver_id = $1
+           AND (u.full_name ILIKE $2 OR u.email ILIKE $2 OR l.relationship ILIKE $2)
+         ORDER BY u.full_name ASC
+         LIMIT 10`, [userId, searchPattern]);
+            patients = patRes.rows;
+            // Caregiver can also search reminders belonging to assigned patients
+            const remRes = await (0, db_1.query)(`SELECT r.id,
+                r.patient_id,
+                u.full_name as patient_name,
+                r.title,
+                r.type,
+                r.scheduled_time,
+                r.dosage_or_notes
+         FROM reminders r
+         JOIN caregiver_patient_links l ON r.patient_id = l.patient_id
+         JOIN users u ON r.patient_id = u.id
+         WHERE l.caregiver_id = $1 AND r.is_active = TRUE
+           AND (r.title ILIKE $2 OR r.dosage_or_notes ILIKE $2 OR u.full_name ILIKE $2)
+         ORDER BY r.scheduled_time ASC
+         LIMIT 10`, [userId, searchPattern]);
+            reminders = remRes.rows;
+        }
+        // 4. Clinician & Admin Search: Broad clinical scope
+        else if (role === 'CLINICIAN' || role === 'ADMIN') {
+            const patRes = await (0, db_1.query)(`SELECT u.id as patient_id,
+                u.full_name,
+                u.email,
+                u.phone_number,
+                p.status as activity_status,
+                c.overall_performance_score
+         FROM users u
+         LEFT JOIN patient_profiles p ON u.id = p.user_id
+         LEFT JOIN cognitive_profiles c ON u.id = c.patient_id
+         WHERE u.role = 'ELDER'
+           AND (u.full_name ILIKE $1 OR u.email ILIKE $1)
+         ORDER BY u.full_name ASC
+         LIMIT 10`, [searchPattern]);
+            patients = patRes.rows;
+        }
+        return res.json({
+            success: true,
+            query: rawQuery,
+            results: {
+                games: gamesRes.rows,
+                reminders,
+                patients
+            }
+        });
+    }
+    catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.searchGlobal = searchGlobal;

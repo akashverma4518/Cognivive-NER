@@ -15,7 +15,11 @@ class PerformanceAnalyzer:
     BASE_TARGET_RT = {
         "memory_blossom": 1400,   # sequence recall requires deliberate thought
         "quick_harvest": 1100,    # speed & visual search
-        "golden_memories": 1800   # reminiscing trivia
+        "golden_memories": 1800,  # reminiscing trivia
+        "pattern_path": 1500,     # attention & sequential visual recall
+        "match_pairs": 1400,      # card matching & working memory
+        "sort_remember": 1600,    # executive categorizing and recall
+        "sequence_stories": 1800  # narrative sequencing & reminiscing
     }
 
     @staticmethod

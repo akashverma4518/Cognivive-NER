@@ -4,6 +4,10 @@ import { gamesApi } from '../../services/api';
 import { MemoryBlossom } from '../../games/MemoryBlossom';
 import { QuickHarvest } from '../../games/QuickHarvest';
 import { GoldenMemories } from '../../games/GoldenMemories';
+import { PatternPath } from '../../games/PatternPath';
+import { MatchPairs } from '../../games/MatchPairs';
+import { SortRemember } from '../../games/SortRemember';
+import { SequenceStories } from '../../games/SequenceStories';
 import { Navbar } from '../../components/common/Navbar';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 
@@ -76,6 +80,22 @@ export const ActiveGamePage: React.FC = () => {
 
   if (gameId === 'golden_memories') {
     return <GoldenMemories initialDifficulty={difficulty} />;
+  }
+
+  if (gameId === 'pattern_path') {
+    return <PatternPath initialDifficulty={difficulty} />;
+  }
+
+  if (gameId === 'match_pairs') {
+    return <MatchPairs initialDifficulty={difficulty} />;
+  }
+
+  if (gameId === 'sort_remember') {
+    return <SortRemember initialDifficulty={difficulty} />;
+  }
+
+  if (gameId === 'sequence_stories') {
+    return <SequenceStories initialDifficulty={difficulty} />;
   }
 
   return (

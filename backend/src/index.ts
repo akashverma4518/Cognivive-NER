@@ -12,6 +12,7 @@ import reminderRoutes from './routes/reminderRoutes';
 import caregiverRoutes from './routes/caregiverRoutes';
 import syncRoutes from './routes/syncRoutes';
 import aiProxyRoutes from './routes/aiProxyRoutes';
+import searchRoutes from './routes/searchRoutes';
 
 const app = express();
 
@@ -47,6 +48,8 @@ app.use('/api/v1/reminders', reminderRoutes);
 app.use('/api/v1/caregiver', caregiverRoutes);
 app.use('/api/v1/sync', syncRoutes);
 app.use('/api/v1/ai', aiProxyRoutes);
+app.use('/api/v1/search', searchRoutes);
+app.use('/api/search', searchRoutes);
 
 app.use(errorHandler);
 

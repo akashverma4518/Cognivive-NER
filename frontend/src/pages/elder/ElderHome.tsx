@@ -23,6 +23,7 @@ import {
   BellOff,
   RotateCcw
 } from 'lucide-react';
+import { VoiceAssistantModal } from '../../components/common/VoiceAssistantModal';
 
 export const ElderHome: React.FC = () => {
   const { user, profile } = useAuth();
@@ -43,6 +44,7 @@ export const ElderHome: React.FC = () => {
   // Voice Interaction State
   const [isListening, setIsListening] = useState<boolean>(false);
   const [voiceFeedback, setVoiceFeedback] = useState<string | null>(null);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
 
   const remindersRef = useRef<HTMLDivElement>(null);
 
@@ -246,6 +248,26 @@ export const ElderHome: React.FC = () => {
         setTimeout(() => navigate('/elder/play/golden_memories'), 1000);
         return;
       }
+      if (lower.includes('pattern') || lower.includes('path')) {
+        speakText('Starting Pattern Path.');
+        setTimeout(() => navigate('/elder/play/pattern_path'), 1000);
+        return;
+      }
+      if (lower.includes('match') || lower.includes('pair')) {
+        speakText('Starting Match Pairs.');
+        setTimeout(() => navigate('/elder/play/match_pairs'), 1000);
+        return;
+      }
+      if (lower.includes('sort') || lower.includes('basket')) {
+        speakText('Starting Sort and Remember.');
+        setTimeout(() => navigate('/elder/play/sort_remember'), 1000);
+        return;
+      }
+      if (lower.includes('story') || lower.includes('stories') || lower.includes('sequence')) {
+        speakText('Starting Sequence Stories.');
+        setTimeout(() => navigate('/elder/play/sequence_stories'), 1000);
+        return;
+      }
       if (lower.includes('read') && (lower.includes('reminder') || lower.includes('schedule') || lower.includes('dawai'))) {
         const pending = reminders.filter(r => r.today_status === 'PENDING');
         if (pending.length === 0) {
@@ -393,15 +415,11 @@ export const ElderHome: React.FC = () => {
             </div>
 
             <button
-              onClick={handleVoiceAssistant}
-              className={`min-h-touch px-6 py-3 rounded-2xl font-black text-elder-base flex items-center gap-3 border-2 transition-all shadow-md shrink-0 ${
-                isListening
-                  ? 'bg-rose-600 text-white border-rose-700 animate-pulse'
-                  : 'bg-gradient-to-r from-[#6C3EDC] to-[#8B5CF6] hover:from-[#5B32C4] hover:to-[#7C4DFF] text-white border-[#5B32C4] shadow-purple-500/25 active:scale-95'
-              }`}
+              onClick={() => setIsVoiceModalOpen(true)}
+              className="min-h-touch px-6 py-3 rounded-2xl font-black text-elder-base flex items-center gap-3 border-2 transition-all shadow-md shrink-0 bg-gradient-to-r from-[#6C3EDC] to-[#8B5CF6] hover:from-[#5B32C4] hover:to-[#7C4DFF] text-white border-[#5B32C4] shadow-purple-500/25 active:scale-95"
             >
               <Mic className="w-6 h-6" />
-              <span>{isListening ? 'Listening...' : 'Tap to Speak'}</span>
+              <span>Tap to Speak</span>
             </button>
           </div>
 
@@ -576,7 +594,13 @@ export const ElderHome: React.FC = () => {
               >
                 <div>
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] border-2 border-purple-200 flex items-center justify-center text-3xl mb-4 shadow-sm">
-                    {g.id === 'memory_blossom' ? '🌸' : g.id === 'quick_harvest' ? '🍎' : '📖'}
+                    {g.id === 'memory_blossom' ? '🌸' :
+                     g.id === 'quick_harvest' ? '🍎' :
+                     g.id === 'golden_memories' ? '📖' :
+                     g.id === 'pattern_path' ? '🧭' :
+                     g.id === 'match_pairs' ? '🪔' :
+                     g.id === 'sort_remember' ? '🧺' :
+                     g.id === 'sequence_stories' ? '📜' : '🧠'}
                   </div>
 
                   <span className="px-3 py-1 bg-purple-50 text-[#6C3EDC] text-xs font-bold rounded-full uppercase tracking-wider border border-purple-100">
@@ -649,6 +673,12 @@ export const ElderHome: React.FC = () => {
           </div>
         </section>
       </main>
+
+      {/* Voice Assistant Modal */}
+      <VoiceAssistantModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+      />
     </div>
   );
 };

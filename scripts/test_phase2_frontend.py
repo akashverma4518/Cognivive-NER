@@ -108,8 +108,8 @@ def run_phase2_tests():
         )
         assert g_res.status_code == 200
         games = g_res.json().get('games', [])
-        assert len(games) == 3, f"Expected 3 games, got {len(games)}"
-        print(f"  -> Retrieved 3 prioritized cognitive games for Elder Home:")
+        assert len(games) >= 3, f"Expected at least 3 games, got {len(games)}"
+        print(f"  -> Retrieved {len(games)} cognitive games for Elder Home:")
         for g in games:
             print(f"     * [{g['id']}] {g['title']} - Domain: {g['primary_domain']}")
     except Exception as e:
