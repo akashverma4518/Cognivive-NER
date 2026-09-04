@@ -122,6 +122,15 @@ export const Login: React.FC = () => {
             <LogIn className="w-6 h-6" />
             <span>{isSubmitting ? 'Signing In...' : 'Sign In'}</span>
           </button>
+
+          <div className="mt-4 text-center">
+            <p className="text-sm font-semibold text-slate-600">
+              New to Cognivive?{' '}
+              <a href="/register" className="text-[#6C3EDC] font-bold hover:underline">
+                Create Senior or Caregiver Account
+              </a>
+            </p>
+          </div>
         </form>
 
         {/* Quick Demo Logins Section */}

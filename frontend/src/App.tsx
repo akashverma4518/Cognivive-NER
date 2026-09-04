@@ -5,9 +5,11 @@ import { SyncProvider } from './context/SyncContext';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 import { Login } from './pages/auth/Login';
+import { Register } from './pages/auth/Register';
 import { ElderHome } from './pages/elder/ElderHome';
 import { ActiveGamePage } from './pages/elder/ActiveGamePage';
 import { CaregiverHome } from './pages/caregiver/CaregiverHome';
+import { PatientReportPage } from './pages/caregiver/PatientReportPage';
 import { ClinicianHome } from './pages/clinician/ClinicianHome';
 import { Unauthorized } from './pages/Unauthorized';
 
@@ -42,6 +44,7 @@ export const App: React.FC = () => {
         <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={<RootRedirect />} />
 
           {/* Elder Portal */}
@@ -63,6 +66,14 @@ export const App: React.FC = () => {
           />
 
           {/* Caregiver Portal */}
+          <Route
+            path="/caregiver/report/:patientId"
+            element={
+              <ProtectedRoute allowedRoles={['CAREGIVER', 'CLINICIAN', 'ADMIN']}>
+                <PatientReportPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/caregiver/*"
             element={
