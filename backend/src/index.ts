@@ -13,6 +13,7 @@ import caregiverRoutes from './routes/caregiverRoutes';
 import syncRoutes from './routes/syncRoutes';
 import aiProxyRoutes from './routes/aiProxyRoutes';
 import searchRoutes from './routes/searchRoutes';
+import careCompanionRoutes from './routes/careCompanionRoutes';
 
 const app = express();
 
@@ -50,6 +51,8 @@ app.use('/api/v1/sync', syncRoutes);
 app.use('/api/v1/ai', aiProxyRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/v1/care', careCompanionRoutes);
+app.use('/api/care', careCompanionRoutes);
 
 app.use(errorHandler);
 

@@ -24,6 +24,9 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { VoiceAssistantModal } from '../../components/common/VoiceAssistantModal';
+import { MyDayCompanion } from '../../components/elder/MyDayCompanion';
+import { WellnessModal } from '../../components/elder/WellnessModal';
+import { FamilyMemoryVaultModal } from '../../components/elder/FamilyMemoryVaultModal';
 
 export const ElderHome: React.FC = () => {
   const { user, profile } = useAuth();
@@ -45,6 +48,8 @@ export const ElderHome: React.FC = () => {
   const [isListening, setIsListening] = useState<boolean>(false);
   const [voiceFeedback, setVoiceFeedback] = useState<string | null>(null);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
+  const [isWellnessOpen, setIsWellnessOpen] = useState<boolean>(false);
+  const [isMemoryVaultOpen, setIsMemoryVaultOpen] = useState<boolean>(false);
 
   const remindersRef = useRef<HTMLDivElement>(null);
 
@@ -431,6 +436,21 @@ export const ElderHome: React.FC = () => {
           )}
         </section>
 
+        {/* Daily Care Companion — My Day */}
+        <MyDayCompanion
+          onStartGame={() => {
+            if (recommendations?.primary_recommendation?.game_id) {
+              navigate(`/elder/play/${recommendations.primary_recommendation.game_id}`);
+            } else if (games.length > 0) {
+              navigate(`/elder/play/${games[0].id}`);
+            }
+          }}
+          onOpenReminders={() => remindersRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          onOpenWellness={() => setIsWellnessOpen(true)}
+          onOpenVoice={() => setIsVoiceModalOpen(true)}
+          onOpenMemoryVault={() => setIsMemoryVaultOpen(true)}
+        />
+
         {/* 3. AI Personalized Recommended Game Highlight */}
         {recommendations?.primary_recommendation && (
           <section className="card-elder bg-[#F7F5FF] border-2 border-[#DDD6FE] shadow-sm relative overflow-hidden">
@@ -678,6 +698,18 @@ export const ElderHome: React.FC = () => {
       <VoiceAssistantModal
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
+      />
+
+      {/* Wellness & Movement Modal */}
+      <WellnessModal
+        isOpen={isWellnessOpen}
+        onClose={() => setIsWellnessOpen(false)}
+      />
+
+      {/* Family Memory Vault Modal */}
+      <FamilyMemoryVaultModal
+        isOpen={isMemoryVaultOpen}
+        onClose={() => setIsMemoryVaultOpen(false)}
       />
     </div>
   );
