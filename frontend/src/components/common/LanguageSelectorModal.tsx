@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check, Volume2, Globe, Sparkles, AlertCircle } from 'lucide-react';
 import { 
+  NER_LANGUAGES,
   ALL_LANGUAGES, 
   LanguageDefinition, 
   getLanguageById, 
@@ -87,7 +88,7 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
             <div>
               <h2 className="text-xl md:text-2xl font-black tracking-tight">Select Language / भाषा चुनें</h2>
               <p className="text-purple-100 text-sm font-medium">
-                Multilingual Voice & Display Selection (11 Indian Languages)
+                North Eastern Region (NER) & National Languages (11 Languages)
               </p>
             </div>
           </div>
@@ -110,7 +111,7 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
 
         {/* Language Grid */}
         <div className="p-4 md:p-6 overflow-y-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {ALL_LANGUAGES.map((lang) => {
+          {NER_LANGUAGES.map((lang) => {
             const isSelected = selectedId === lang.id;
             return (
               <div

@@ -29,6 +29,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
   const [confidence, setConfidence] = useState<number | null>(null);
   const [pendingConfirmation, setPendingConfirmation] = useState<PendingConfirmation | null>(null);
   const [manualText, setManualText] = useState<string>('');
+  const timeoutRef = useRef<any>(null);
 
   const currentLang = speechManager.getLanguage();
 
@@ -54,28 +55,38 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
     setIsListening(true);
     setStatusMessage(`Listening in ${currentLang.nativeName}...`);
 
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      stopVoiceListening();
+      setStatusMessage("Sorry, I didn't hear anything. Tap Try Again or type a command.");
+    }, 10000);
+
     speechManager.getActiveProvider().startListening({
       langCode: currentLang.code,
       onStart: () => {
         setIsListening(true);
       },
       onResult: (text: string, conf: number) => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setIsListening(false);
         setTranscript(text);
         setConfidence(conf);
         handleProcessSpeech(text, conf);
       },
       onError: (err: string) => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setIsListening(false);
-        setStatusMessage(err);
+        setStatusMessage(err || "Sorry, I didn't hear that. Tap Try Again.");
       },
       onEnd: () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setIsListening(false);
       }
     });
   };
 
   const stopVoiceListening = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setIsListening(false);
     speechManager.getActiveProvider().stopListening();
   };
