@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const profileController_1 = require("../controllers/profileController");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const router = (0, express_1.Router)();
+router.get('/cognitive', authMiddleware_1.authenticateJwt, profileController_1.getCognitiveProfile);
+router.get('/cognitive/:patientId', authMiddleware_1.authenticateJwt, profileController_1.getCognitiveProfile);
+router.post('/baseline', authMiddleware_1.authenticateJwt, profileController_1.setBaselineActivity);
+router.get('/recommendations', authMiddleware_1.authenticateJwt, profileController_1.getDailyRecommendations);
+exports.default = router;

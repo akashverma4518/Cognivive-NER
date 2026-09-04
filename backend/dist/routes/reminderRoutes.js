@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const reminderController_1 = require("../controllers/reminderController");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const router = (0, express_1.Router)();
+router.get('/today', authMiddleware_1.authenticateJwt, reminderController_1.getTodayReminders);
+router.post('/:id/acknowledge', authMiddleware_1.authenticateJwt, reminderController_1.acknowledgeReminder);
+router.post('/', authMiddleware_1.authenticateJwt, reminderController_1.createReminder);
+router.put('/:id', authMiddleware_1.authenticateJwt, reminderController_1.updateReminder);
+router.delete('/:id', authMiddleware_1.authenticateJwt, reminderController_1.deleteReminder);
+exports.default = router;

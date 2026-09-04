@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-elder-bg text-elder-navy font-sans antialiased text-elder-base;
+    min-height: 100vh;
+  }
+
+  /* Accessible focus indicators for motor tremor / accessibility navigation */
+  button:focus-visible, a:focus-visible, input:focus-visible {
+    @apply outline-none ring-4 ring-[#8B5CF6] ring-offset-2 ring-offset-white;
+  }
+}
+
+@layer components {
+  /* Minimum 60px touch targets with generous tactile feedback */
+  .btn-elder-primary {
+    @apply min-h-touch px-6 py-3 rounded-2xl bg-gradient-to-r from-[#6C3EDC] to-[#8B5CF6] hover:from-[#5B32C4] hover:to-[#7C4DFF] active:scale-[0.98] 
+           text-white font-bold text-elder-base shadow-md shadow-purple-500/20 transition-all duration-150 
+           flex items-center justify-center gap-3 border-2 border-[#5B32C4];
+  }
+
+  .btn-elder-secondary {
+    @apply min-h-touch px-6 py-3 rounded-2xl bg-white hover:bg-purple-50/60 active:scale-[0.98] 
+           text-elder-navy font-bold text-elder-base shadow-sm border-2 border-purple-200 
+           transition-all duration-150 flex items-center justify-center gap-3;
+  }
+
+  .btn-elder-success {
+    @apply min-h-touch px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] 
+           text-white font-bold text-elder-base shadow-md border-2 border-emerald-700 
+           transition-all duration-150 flex items-center justify-center gap-3;
+  }
+
+  .card-elder {
+    @apply bg-white rounded-3xl p-6 shadow-[0_4px_20px_-2px_rgba(108,62,220,0.06)] border-2 border-purple-100;
+  }
+}
