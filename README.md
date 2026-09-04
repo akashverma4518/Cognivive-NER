@@ -47,10 +47,10 @@ Cognivive NER uses a decoupled microservices architecture:
 
 ## 3. Tech Stack
 
-- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Lucide Icons, Browser Web Speech API, IndexedDB.
-- **Backend API**: Node.js, Express, TypeScript, `pg` pool, `bcryptjs`, `jsonwebtoken`.
-- **AI Microservice**: Python 3.12, FastAPI, Pydantic v2, Uvicorn, NumPy / Scikit-learn (assistive algorithms).
-- **Database**: PostgreSQL 16 with UUID extension.
+- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Html.
+- **Backend API**: Node.js, Express.js, TypeScript
+- **AI Microservice**: Python 3.12, FastAPI,NumPy.
+- **Database**: PostgreSQL .
 - **Containerization**: Docker & Docker Compose (`docker-compose.yml`).
 
 ---
