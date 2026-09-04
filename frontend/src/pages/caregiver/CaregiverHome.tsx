@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Navbar } from '../../components/common/Navbar';
 import { apiClient } from '../../services/api';
@@ -27,9 +28,12 @@ import { GameAnalyticsCard } from '../../components/caregiver/GameAnalyticsCard'
 import { ReminderAdherenceView } from '../../components/caregiver/ReminderAdherenceView';
 import { PerformanceChangeAlertCard } from '../../components/caregiver/PerformanceChangeAlertCard';
 import { AiRecommendationCard } from '../../components/caregiver/AiRecommendationCard';
+import { CareActionCenter } from '../../components/caregiver/CareActionCenter';
+import { FamilyMemoryVaultModal } from '../../components/elder/FamilyMemoryVaultModal';
 
 export const CaregiverHome: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // State
   const [patients, setPatients] = useState<any[]>([]);
@@ -39,6 +43,7 @@ export const CaregiverHome: React.FC = () => {
   const [games, setGames] = useState<any[]>([]);
   const [remindersData, setRemindersData] = useState<any>(null);
   const [alerts, setAlerts] = useState<any>({ overdueMedicationAlerts: [], performanceChangeAlerts: [] });
+  const [isMemoryVaultOpen, setIsMemoryVaultOpen] = useState<boolean>(false);
 
   const [loading, setLoading] = useState(true);
   const [patientLoading, setPatientLoading] = useState(false);
@@ -180,6 +185,15 @@ export const CaregiverHome: React.FC = () => {
           </div>
         )}
 
+        {/* Care Action Center */}
+        <CareActionCenter
+          onSelectPatient={(id) => {
+            setSelectedPatientId(id);
+            loadSelectedPatientData(id);
+          }}
+          onOpenReport={(id) => navigate(`/caregiver/report/${id}`)}
+        />
+
         {/* 1. Patient Roster & Selector */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
@@ -302,6 +316,24 @@ export const CaregiverHome: React.FC = () => {
                     </span>
                   </div>
                 </div>
+              </div>
+
+              {/* Action Buttons for Patient */}
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-purple-100/60">
+                <button
+                  onClick={() => navigate(`/caregiver/report/${selectedPatient.id}`)}
+                  className="px-4 py-2.5 bg-[#6C3EDC] hover:bg-purple-700 text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Generate Full Progress Report</span>
+                </button>
+                <button
+                  onClick={() => setIsMemoryVaultOpen(true)}
+                  className="px-4 py-2.5 bg-purple-50 hover:bg-purple-100 text-[#6C3EDC] font-bold text-xs rounded-xl flex items-center gap-2 border border-purple-200 cursor-pointer"
+                >
+                  <HeartHandshake className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Manage Family Memory Vault</span>
+                </button>
               </div>
 
               {/* Navigation Tabs */}
@@ -476,6 +508,14 @@ export const CaregiverHome: React.FC = () => {
           </section>
         )}
       </main>
+
+      {/* Family Memory Vault Modal */}
+      <FamilyMemoryVaultModal
+        isOpen={isMemoryVaultOpen}
+        onClose={() => setIsMemoryVaultOpen(false)}
+        canEdit={true}
+        targetPatientId={selectedPatientId || undefined}
+      />
     </div>
   );
 };
